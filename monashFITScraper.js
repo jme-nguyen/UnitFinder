@@ -3,7 +3,7 @@ import puppeteer from "puppeteer";
 const scrapeData = async () => {
 
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         defaultViewport: null,
     });
 
@@ -55,32 +55,17 @@ const scrapeData = async () => {
 
     let allUnits = await extractUnits();
 
-    const acceptCookies = '#preferences_prompt_submit'
-    await page.click(acceptCookies);
-
     const nextPageSelector = `${unitNavSelector} #pagination-page-next`;
 
-    const lastButton = async () => {
-        return await page.evaluate(() => {
-            const buttons = document.querySelectorAll('#pagination-page-next');
-            return buttons[buttons.length - 1];
-    })}
-
-    const isDisabled = async () => {
-        return await page.evaluate(() => {
-            const buttonMash = lastButton();
-            const button = document.querySelector(buttonMash);
-            return button ? button.disabled : true;
-        })
-    }
-
-    while (!isDisabled()){
+    for (let i = 0; i < 12; i++){
         await page.click(nextPageSelector);
+        // After clicking, we must wait for the content to be loaded dynamically.
+        await page.waitForNetworkIdle({ idleTime: 500 });
         const pageUnits = await extractUnits();
         allUnits = allUnits.concat(pageUnits);
     }
 
-    // await browser.close();
+    await browser.close();
 
     console.log(allUnits);
     return allUnits;
