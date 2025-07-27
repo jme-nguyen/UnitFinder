@@ -38,13 +38,17 @@ const scrapeData = async () => {
             // Extract credit points
             const creditElement = link.querySelector('.uoc-text, [class*="uoc-text"]');
             const credits = creditElement ? creditElement.textContent.trim() : '';
+
+            const urls = link.href;
+
             
             if (unitCode) {
                 units.push({
                 code: unitCode,
                 title: unitTitle,
                 credits: credits,
-                fullName: `${unitCode} - ${unitTitle}`
+                fullName: `${unitCode} - ${unitTitle}`,
+                url: urls
                 });
             }
             });
