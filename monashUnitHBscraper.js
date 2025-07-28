@@ -14,17 +14,14 @@ const scrapeUnit = async () => {
     const assessmentSelector = 'div[data-menu-title="Assessment"]';
 
     await page.waitForSelector(offeringsSelector);
-    const el = await page.$(offeringsSelector);
 
-    // const text = await el.evaluate(e => e.innerHTML);
+    const offeringContainer = await page.$(offeringsSelector);
+    const assessmentContainer = await page.$(assessmentSelector);
 
-    console.log(text);
-
-    const offeringsData = await page.evaluate((selector) => {
+    // Scrape offerings for the unit
+    const offeringsData = await offeringContainer.evaluate((container) => {
 
         const results = [];
-
-        const container = document.querySelector(selector)
         
         // Find all accordion items within container
         const accordionItems = container.querySelectorAll('.AccordionItem');
@@ -64,10 +61,48 @@ const scrapeUnit = async () => {
             }
         })
         return results;
-    }, offeringsSelector);
+    });
+
+    const assessmentData = await assessmentContainer.evaluate((container) => {
+        
+        const results = [];
+
+        // Find all accordion items within this specific container
+        const accordionItems = container.querySelectorAll('.AccordionItem');
+
+        accordionItems.forEach(item => {
+            // Get the assessment name from the h4 heading
+            const heading = item.querySelector('h4');
+            const assessmentName = heading ? heading.textContent.trim() : '';
+      
+            // Get the value percentage from the accordion body
+            const accordionBody = item.querySelector('[class*="SAccordionContentContainer"]');
+            let valuePercent = '';
+
+            if (accordionBody) {
+                const cardBodies = accordionBody.querySelectorAll('[class*="CardBody"]');
+
+                cardBodies.forEach(cardBody => {
+                    const text = cardBody.textContent.trim();
+
+                    if (text.startsWith('Value %:')){
+                        valuePercent = text.replace('Value %:', '').trim();
+                    }
+                });
+            }
+            if (assessmentName) {
+                results.push({
+                    name: assessmentName,
+                    valuePercent: valuePercent || 'N/A'
+                });
+            }
+        });
+        return results;
+    })
 
     await browser.close();
-    console.log(offeringsData);
+    // console.log(offeringsData);
+    console.log(assessmentData)
     return offeringsData;
 }
 
