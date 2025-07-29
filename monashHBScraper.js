@@ -9,7 +9,7 @@ const scrapeData = async () => {
 
     const page = await browser.newPage();
 
-    await page.goto("https://handbook.monash.edu/browse/By%20Faculty/FacultyofScience");
+    await page.goto("https://handbook.monash.edu/browse/By%20Faculty/FacultyofInformationTechnology");
 
     // const delay = ms => new Promise(res => setTimeout(res, ms));
     
@@ -27,30 +27,30 @@ const scrapeData = async () => {
             const unitLinks = document.querySelectorAll('a[href*="/units/"]');
             
             unitLinks.forEach(link => {
-            // Extract unit code from the header section
-            const unitCodeElement = link.querySelector('.StyledAILinkHeaderSection__content1, [class*="StyledAILinkHeaderSection__content1"]');
-            const unitCode = unitCodeElement ? unitCodeElement.textContent.trim() : '';
-            
-            // Extract unit title from the body section
-            const unitTitleElement = link.querySelector('.unit-title, [class*="unit-title"]');
-            const unitTitle = unitTitleElement ? unitTitleElement.textContent.trim() : '';
-            
-            // Extract credit points
-            const creditElement = link.querySelector('.uoc-text, [class*="uoc-text"]');
-            const credits = creditElement ? creditElement.textContent.trim() : '';
+                // Extract unit code from the header section
+                const unitCodeElement = link.querySelector('.StyledAILinkHeaderSection__content1, [class*="StyledAILinkHeaderSection__content1"]');
+                const unitCode = unitCodeElement ? unitCodeElement.textContent.trim() : '';
+                
+                // Extract unit title from the body section
+                const unitTitleElement = link.querySelector('.unit-title, [class*="unit-title"]');
+                const unitTitle = unitTitleElement ? unitTitleElement.textContent.trim() : '';
+                
+                // Extract credit points
+                const creditElement = link.querySelector('.uoc-text, [class*="uoc-text"]');
+                const credits = creditElement ? creditElement.textContent.trim() : '';
 
-            const urls = link.href;
+                const urls = link.href;
 
-            
-            if (unitCode) {
-                units.push({
-                code: unitCode,
-                title: unitTitle,
-                credits: credits,
-                fullName: `${unitCode} - ${unitTitle}`,
-                url: urls
-                });
-            }
+                
+                if (unitCode) {
+                    units.push({
+                    code: unitCode,
+                    title: unitTitle,
+                    credits: credits,
+                    fullName: `${unitCode} - ${unitTitle}`,
+                    url: urls
+                    });
+                }
             });
             
             return units;
