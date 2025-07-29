@@ -8,17 +8,19 @@ const scrapeUnit = async () => {
     });
 
     const page = await browser.newPage();
-    await page.goto("https://handbook.monash.edu/2025/units/FIT3080?year=2025");
+    await page.goto("https://handbook.monash.edu/2025/units/fit3143?year=2025");
 
     const offeringsSelector = 'div[data-menu-title="Offerings"]';
     const assessmentSelector = 'div[data-menu-title="Assessment"]';
     const requisiteSelector = 'div[data-menu-title="Requisites"]';
+    const sidebarSelector = 'div[data-testid="attributes-table"]'
 
     await page.waitForSelector(assessmentSelector);
 
     const offeringContainer = await page.$(offeringsSelector);
     const assessmentContainer = await page.$(assessmentSelector);
     const requisiteContainer = await page.$(requisiteSelector);
+    const sidebarContainer = await page.$(sidebarSelector);
 
     // Scrape offerings for the unit
     const offeringsData = await offeringContainer.evaluate((container) => {
@@ -172,14 +174,63 @@ const scrapeUnit = async () => {
         return results;
     });
 
+    const sidebarData = await sidebarContainer.evaluate((container) => {
+        const result = {};
+
+        // Find all attribute containers within this specific container
+        const attributeContainers = container.querySelectorAll('[class*="AttrContainer"]');
+
+        attributeContainers.forEach(attrContainer => {
+            //Get the attribute header (label)
+            const header = attrContainer.querySelector('[class*="AttrHeader"]');
+            const headerText = header ? header.textContent.trim() : '';
+
+            // Get the attribute body (value)
+            const body = attrContainer.querySelector('[data-testid="AttrBody"]');
+            let bodyText = '';
+
+            if (body) {
+                // First try to get text from the flex container
+                const flexDiv = body.querySelector('[class*="Flex--Flex"]');
+                if (flexDiv) {
+                    bodyText = flexDiv.textContent.trim();
+                }
+
+                // If no text in flex div, check for links
+                if (!bodyText) {
+                    const link = body.querySelector('a');
+                    if (link) {
+                        bodyText = link.textContent.trim();
+                    }
+                }
+
+                if (!bodyText) {
+                    bodyText = body.textContent.trim();
+                }
+            }
+
+            if (headerText.includes('Faculty:')) {
+                result.faculty = bodyText;
+            } else if (headerText.includes('Study level:')) {
+                result.studyLevel = bodyText;
+            } else if (headerText.includes('Credit points:')) {
+                result.creditPoints = bodyText;
+            } else if (headerText.includes('Open to exchange or study abroad students?')) {
+                result.openToExchange = bodyText;
+            }
+        });
+
+        return result;
+    })
+
     await browser.close();
 
     const unitInfo = {
+        attributes: sidebarData,
         requisite: requisiteData,
         offerings: offeringsData,
         assessments: assessmentData
     }
-    
     return unitInfo;
 }
 
