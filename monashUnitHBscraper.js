@@ -8,7 +8,7 @@ const scrapeUnit = async () => {
     });
 
     const page = await browser.newPage();
-    await page.goto("https://handbook.monash.edu/2025/units/fit3143?year=2025");
+    await page.goto("https://handbook.monash.edu/2025/units/LAW1111?year=2025");
 
     const offeringsSelector = 'div[data-menu-title="Offerings"]';
     const assessmentSelector = 'div[data-menu-title="Assessment"]';
@@ -23,7 +23,7 @@ const scrapeUnit = async () => {
     const sidebarContainer = await page.$(sidebarSelector);
 
     // Scrape offerings for the unit
-    const offeringsData = await offeringContainer.evaluate((container) => {
+    const offeringsData = offeringContainer ? await offeringContainer.evaluate((container) => {
 
         const results = [];
         
@@ -65,10 +65,10 @@ const scrapeUnit = async () => {
             }
         })
         return results;
-    });
+    }) : [];
 
     // Scrape assessment breakdown for the unit
-    const assessmentData = await assessmentContainer.evaluate((container) => {
+    const assessmentData = assessmentContainer ? await assessmentContainer.evaluate((container) => {
         
         const results = [];
 
@@ -103,9 +103,9 @@ const scrapeUnit = async () => {
             }
         });
         return results;
-    })
+    }) : [];
 
-    const requisiteData = await requisiteContainer.evaluate((container) => {
+    const requisiteData = requisiteContainer ? await requisiteContainer.evaluate((container) => {
 
         const results = [];
 
@@ -172,9 +172,9 @@ const scrapeUnit = async () => {
         });
 
         return results;
-    });
+    }) : [];
 
-    const sidebarData = await sidebarContainer.evaluate((container) => {
+    const sidebarData = sidebarContainer ? await sidebarContainer.evaluate((container) => {
         const result = {};
 
         // Find all attribute containers within this specific container
@@ -221,7 +221,7 @@ const scrapeUnit = async () => {
         });
 
         return result;
-    })
+    }) : {};
 
     await browser.close();
 
@@ -236,7 +236,7 @@ const scrapeUnit = async () => {
 
 scrapeUnit()
     .then(data => {
-        console.log('Requisite data:', JSON.stringify(data,null,2));
+        console.log('Scraped Data:', JSON.stringify(data,null,2));
     })
     .catch(error => {
         console.error('Error: ', error);
