@@ -9,7 +9,7 @@ const scrapeData = async () => {
 
     const page = await browser.newPage();
 
-    await page.goto("https://handbook.monash.edu/browse/By%20Faculty/FacultyofInformationTechnology");
+    await page.goto("https://handbook.monash.edu/browse/By%20Faculty/FacultyofScience");
 
     // const delay = ms => new Promise(res => setTimeout(res, ms));
     
@@ -59,9 +59,30 @@ const scrapeData = async () => {
 
     let allUnits = await extractUnits();
 
+    const footerSelector =`${unitNavSelector} .PaginationFooter`
+    const footerContainer = await page.$(footerSelector);
+
+    const totalUnits = footerContainer ? await footerContainer.evaluate((container) => {
+        const paginationLegend = container.querySelector('[class*="SPaginatorLegend"]');
+
+        if (paginationLegend) {
+            const text = paginationLegend.textContent.trim();
+
+            const match = text.match(/of\s+(\d+)/i);
+
+            if (match) {
+                return parseInt(match[1], 10);
+            }
+        }
+
+        return null;
+    }) : null;
+
+    const totalClicks = Math.ceil(totalUnits / 10) - 1
+
     const nextPageSelector = `${unitNavSelector} #pagination-page-next`;
 
-    for (let i = 0; i < 12; i++){
+    for (let i = 0; i < totalClicks; i++){
         await page.click(nextPageSelector);
         // After clicking, we must wait for the content to be loaded dynamically.
         await page.waitForNetworkIdle({ idleTime: 500 });
@@ -71,7 +92,7 @@ const scrapeData = async () => {
 
     await browser.close();
 
-    console.log(allUnits);
+    console.log(allUnits.length);
     return allUnits;
 }
 
