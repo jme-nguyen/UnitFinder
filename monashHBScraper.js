@@ -7,6 +7,8 @@ const scrapeData = async () => {
         defaultViewport: null,
     });
 
+    // Need commit to publish this branch
+
     const page = await browser.newPage();
 
     await page.goto("https://handbook.monash.edu/browse/By%20Faculty/FacultyofInformationTechnology");
