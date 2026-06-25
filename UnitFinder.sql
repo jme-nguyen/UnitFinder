@@ -1,7 +1,7 @@
-DROP TABLE units CASCADE CONSTRAINTS;
-DROP TABLE faculty CASCADE CONSTRAINTS;
-DROP TABLE offering CASCADE CONSTRAINTS;
-DROP TABLE unit_offering CASCADE CONSTRAINTS;
+DROP TABLE units CASCADE;
+DROP TABLE faculty CASCADE;
+DROP TABLE offering CASCADE;
+DROP TABLE unit_offering CASCADE;
 
 CREATE TYPE study_level_enum AS ENUM ('undergraduate', 'postgraduate', 'research');
 
