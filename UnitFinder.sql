@@ -1,7 +1,9 @@
-DROP TABLE units CASCADE;
-DROP TABLE faculty CASCADE;
-DROP TABLE offering CASCADE;
-DROP TABLE unit_offering CASCADE;
+DROP TABLE IF EXISTS units CASCADE;
+DROP TABLE IF EXISTS faculty CASCADE;
+DROP TABLE IF EXISTS offering CASCADE;
+DROP TABLE IF EXISTS unit_offering CASCADE;
+DROP TYPE IF EXISTS study_level_enum CASCADE;
+DROP TYPE IF EXISTS attendance_mode_enum CASCADE;
 
 CREATE TYPE study_level_enum AS ENUM ('undergraduate', 'postgraduate', 'research');
 
