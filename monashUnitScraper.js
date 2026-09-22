@@ -11,7 +11,7 @@ const scrapeUnit = async () => {
     });
 
     const page = await browser.newPage();
-    await page.goto("https://handbook.monash.edu/2025/units/LAW1111?year=2025");
+    await page.goto("https://handbook.monash.edu/2026/units/ENG2005?year=2026");
 
     const offeringsSelector = 'div[data-menu-title="Offerings"]';
     const assessmentSelector = 'div[data-menu-title="Assessment"]';
@@ -220,6 +220,10 @@ const scrapeUnit = async () => {
                 result.creditPoints = bodyText;
             } else if (headerText.includes('Open to exchange or study abroad students?')) {
                 result.openToExchange = bodyText;
+            } else if (headerText.includes('SCA band:')){
+                result.sca = bodyText;
+            } else if (headerText.includes('EFTSL:')){
+                result.eftsl = bodyText;
             }
         });
 
